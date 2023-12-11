@@ -161,6 +161,3 @@ func Deserialization(input string) []string {
 	}
 	return []string{input}
 }
-
-func main() {
-}
