@@ -3,18 +3,30 @@ package main
 import (
 	"fmt"
 	"net"
+	"resp"
 )
 
 func handleConnectionRequest(conn net.Conn) {
 	defer conn.Close()
 	buf := make([]byte, 1024)
-
 	_, err := conn.Read(buf)
+	stringResp := string(buf[:])
+
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("Received: %s\n", buf)
+
+	command := resp.Deserialization(stringResp)
+
+	switch command[0] {
+	case "PING":
+		conn.Write([]byte("PONG\n"))
+	case "ECHO":
+		conn.Write([]byte(command[1] + "\n"))
+	default:
+		conn.Write([]byte(stringResp))
+	}
 }
 
 func main() {
